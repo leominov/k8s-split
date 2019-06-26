@@ -22,7 +22,7 @@ type Description struct {
 }
 
 var (
-	specsFile = flag.String("f", "", "Path to file with Kubernetes specifications")
+	specsFile = flag.String("f", "", "Path to file with Kubernetes specification")
 	outputDir = flag.String("o", "", "Path to output directory")
 )
 
