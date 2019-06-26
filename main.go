@@ -52,6 +52,7 @@ func main() {
 	}
 }
 
+// SplitByEntries split multi-document YAML into separated maps
 func SplitByEntries(body []byte) (result []map[string]interface{}, err error) {
 	dec := yaml.NewDecoder(bytes.NewReader(body))
 	for {
@@ -78,6 +79,7 @@ func writeToFile(filename string, val interface{}) error {
 	return err
 }
 
+// GetNameAndKind get Kubernetes `kind` and `name` from document
 func GetNameAndKind(val interface{}) (kind, name string, err error) {
 	result := &Description{}
 	if err = mapstructure.Decode(val, &result); err != nil {
