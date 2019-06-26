@@ -29,27 +29,36 @@ var (
 
 func main() {
 	flag.Parse()
-	body, err := ioutil.ReadFile(*specsFile)
+	err := Process(*specsFile, *outputDir)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// Process read inputFile, process and save to outputDir
+func Process(inputFile, outputDir string) error {
+	body, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		return err
+	}
 	entries, err := SplitByEntries(body)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	for _, entry := range entries {
 		kind, name, err := GetNameAndKind(entry)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		log.Printf("Found %s.%s", name, kind)
-		filename := path.Join(*outputDir, fmt.Sprintf("%s.%s.yaml", name, kind))
+		filename := path.Join(outputDir, fmt.Sprintf("%s.%s.yaml", name, kind))
 		err = writeToFile(filename, entry)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		log.Printf("Saved to %s", filename)
 	}
+	return nil
 }
 
 // SplitByEntries split multi-document YAML into separated maps

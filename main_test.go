@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"testing"
 )
 
@@ -80,5 +81,33 @@ func TestGetNameAndKind(t *testing.T) {
 	}
 	if name != "name" {
 		t.Errorf("Must be name, but got %s", name)
+	}
+}
+
+func TestProcess(t *testing.T) {
+	err := os.MkdirAll("tmp", os.ModePerm)
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.RemoveAll("tmp")
+	tests := []string{
+		"test_data/correct_single.yaml",
+		"test_data/correct_multi.yaml",
+	}
+	for _, test := range tests {
+		if err := Process(test, "tmp"); err != nil {
+			t.Error(err)
+		}
+	}
+	tests = []string{
+		"test_data/incorrect_not_found.yaml",
+		"test_data/incurrect_1.yaml",
+		"test_data/incurrect_2.yaml",
+		"test_data/incurrect_3.yaml",
+	}
+	for _, test := range tests {
+		if err := Process(test, "tmp"); err == nil {
+			t.Error("Must be an error, but got nil")
+		}
 	}
 }
