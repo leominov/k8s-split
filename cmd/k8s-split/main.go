@@ -7,13 +7,6 @@ import (
 	split "github.com/leominov/k8s-split"
 )
 
-type Description struct {
-	Kind     string
-	Metadata struct {
-		Name string
-	}
-}
-
 var (
 	specsFile = flag.String("f", "", "Path to file with Kubernetes specification")
 	outputDir = flag.String("o", "", "Path to output directory")
