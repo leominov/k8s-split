@@ -1,0 +1,3 @@
+*.yaml
+*.yml
+/k8s-split
