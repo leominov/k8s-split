@@ -1,9 +1,8 @@
-package main
+package split
 
 import (
 	"bytes"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,19 +18,6 @@ type Description struct {
 	Kind     string
 	Metadata struct {
 		Name string
-	}
-}
-
-var (
-	specsFile = flag.String("f", "", "Path to file with Kubernetes specification")
-	outputDir = flag.String("o", "", "Path to output directory")
-)
-
-func main() {
-	flag.Parse()
-	err := Process(*specsFile, *outputDir)
-	if err != nil {
-		log.Fatal(err)
 	}
 }
 
