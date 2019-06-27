@@ -89,7 +89,10 @@ func TestProcess(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer os.RemoveAll("tmp")
+	defer func() {
+		os.Chmod("tmp", os.ModePerm)
+		os.RemoveAll("tmp")
+	}()
 	tests := []string{
 		"test_data/correct_single.yaml",
 		"test_data/correct_multi.yaml",
@@ -98,6 +101,13 @@ func TestProcess(t *testing.T) {
 		if err := Process(test, "tmp"); err != nil {
 			t.Error(err)
 		}
+	}
+	err = os.Chmod("tmp", 0444)
+	if err != nil {
+		t.Error(err)
+	}
+	if err := Process("test_data/correct_single.yaml", "tmp"); err == nil {
+		t.Error("Must be an error, but got nil")
 	}
 	tests = []string{
 		"test_data/incorrect_not_found.yaml",
