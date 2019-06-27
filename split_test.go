@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestSplitByEntries(t *testing.T) {
+func TestByEntries(t *testing.T) {
 	tests := []struct {
 		input string
 		count int
@@ -24,7 +24,7 @@ document: 2
 		},
 	}
 	for _, test := range tests {
-		res, err := SplitByEntries([]byte(test.input))
+		res, err := ByEntries([]byte(test.input))
 		if err != nil {
 			t.Error(err)
 		}
@@ -32,7 +32,7 @@ document: 2
 			t.Errorf("Must be %d, but got %d", test.count, len(res))
 		}
 	}
-	_, err := SplitByEntries([]byte(`
+	_, err := ByEntries([]byte(`
 	`))
 	if err == nil {
 		t.Error("Must be an error, but got nil")

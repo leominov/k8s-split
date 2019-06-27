@@ -14,6 +14,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Description Kubernetes specification
 type Description struct {
 	Kind     string
 	Metadata struct {
@@ -27,7 +28,7 @@ func Process(inputFile, outputDir string) error {
 	if err != nil {
 		return err
 	}
-	entries, err := SplitByEntries(body)
+	entries, err := ByEntries(body)
 	if err != nil {
 		return err
 	}
@@ -47,8 +48,8 @@ func Process(inputFile, outputDir string) error {
 	return nil
 }
 
-// SplitByEntries split multi-document YAML into separated maps
-func SplitByEntries(body []byte) (result []map[string]interface{}, err error) {
+// ByEntries split multi-document YAML into separated maps
+func ByEntries(body []byte) (result []map[string]interface{}, err error) {
 	dec := yaml.NewDecoder(bytes.NewReader(body))
 	for {
 		var value map[string]interface{}
