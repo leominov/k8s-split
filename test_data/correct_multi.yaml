@@ -1,0 +1,8 @@
+---
+kind: Pod
+metadata:
+  name: single
+---
+kind: CronJob
+metadata:
+  name: single

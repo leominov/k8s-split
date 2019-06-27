@@ -1,5 +1,4 @@
-*.yaml
-*.yml
+/*.yaml
 /k8s-split
 /coverage.txt
 /tmp
