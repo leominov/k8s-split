@@ -4,3 +4,13 @@
 [![codecov](https://codecov.io/gh/leominov/k8s-split/branch/master/graph/badge.svg)](https://codecov.io/gh/leominov/k8s-split)
 
 Split multi document Kubernetes specification file into separate files by `name` and `kind`.
+
+## Usage
+
+```
+$ k8s-split -f test_data/correct_multi.yaml -o ./
+Found single.Pod
+Saved to single.Pod.yaml
+Found single.CronJob
+Saved to single.CronJob.yaml
+```
