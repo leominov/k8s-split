@@ -1,6 +1,7 @@
 package split
 
 import (
+	"bytes"
 	"os"
 	"testing"
 )
@@ -24,7 +25,7 @@ document: 2
 		},
 	}
 	for _, test := range tests {
-		res, err := ByEntries([]byte(test.input))
+		res, err := ByEntries(bytes.NewReader([]byte(test.input)))
 		if err != nil {
 			t.Error(err)
 		}
@@ -32,8 +33,8 @@ document: 2
 			t.Errorf("Must be %d, but got %d", test.count, len(res))
 		}
 	}
-	_, err := ByEntries([]byte(`
-	`))
+	_, err := ByEntries(bytes.NewReader([]byte(`
+	`)))
 	if err == nil {
 		t.Error("Must be an error, but got nil")
 	}

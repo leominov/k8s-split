@@ -8,13 +8,13 @@ import (
 )
 
 var (
-	specsFile = flag.String("f", "", "Path to file with Kubernetes specification")
-	outputDir = flag.String("o", "", "Path to output directory")
+	input  = flag.String("f", "", "Path to file with Kubernetes specification")
+	output = flag.String("o", "", "Path to output directory")
 )
 
 func main() {
 	flag.Parse()
-	err := split.Process(*specsFile, *outputDir)
+	err := split.Process(*input, *output)
 	if err != nil {
 		log.Fatal(err)
 	}

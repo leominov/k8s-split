@@ -1,7 +1,7 @@
 package split
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -22,13 +22,24 @@ type Description struct {
 	}
 }
 
-// Process read inputFile, process and save to outputDir
-func Process(inputFile, outputDir string) error {
-	body, err := ioutil.ReadFile(inputFile)
+func readerFromInput(input string) (io.Reader, error) {
+	if input == "-" {
+		return bufio.NewReader(os.Stdin), nil
+	}
+	r, err := os.Open(input)
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+// Process read input source, process and save to output directory
+func Process(input, output string) error {
+	r, err := readerFromInput(input)
 	if err != nil {
 		return err
 	}
-	entries, err := ByEntries(body)
+	entries, err := ByEntries(r)
 	if err != nil {
 		return err
 	}
@@ -38,7 +49,7 @@ func Process(inputFile, outputDir string) error {
 			return err
 		}
 		log.Printf("Found %s.%s", name, kind)
-		filename := path.Join(outputDir, fmt.Sprintf("%s.%s.yaml", name, kind))
+		filename := path.Join(output, fmt.Sprintf("%s.%s.yaml", name, kind))
 		err = writeToFile(filename, entry)
 		if err != nil {
 			return err
@@ -49,8 +60,8 @@ func Process(inputFile, outputDir string) error {
 }
 
 // ByEntries split multi-document YAML into separated maps
-func ByEntries(body []byte) (result []map[string]interface{}, err error) {
-	dec := yaml.NewDecoder(bytes.NewReader(body))
+func ByEntries(r io.Reader) (result []map[string]interface{}, err error) {
+	dec := yaml.NewDecoder(r)
 	for {
 		var value map[string]interface{}
 		err = dec.Decode(&value)
