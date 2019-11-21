@@ -20,7 +20,7 @@ Saved to single.CronJob.yaml
 ### Stdin
 
 ```
-$ cat test_data/correct_multi.yaml | k8s-split -f - -o ./
+$ cat test_data/correct_multi.yaml | k8s-split -f -
 Found single.Pod
 Saved to single.Pod.yaml
 Found single.CronJob
