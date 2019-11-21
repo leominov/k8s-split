@@ -7,8 +7,20 @@ Split multi document Kubernetes specification file into separate files by `name`
 
 ## Usage
 
+### File
+
 ```
 $ k8s-split -f test_data/correct_multi.yaml -o ./
+Found single.Pod
+Saved to single.Pod.yaml
+Found single.CronJob
+Saved to single.CronJob.yaml
+```
+
+### Stdin
+
+```
+$ cat test_data/correct_multi.yaml | k8s-split -f - -o ./
 Found single.Pod
 Saved to single.Pod.yaml
 Found single.CronJob
