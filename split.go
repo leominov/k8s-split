@@ -78,10 +78,7 @@ func ByEntries(r io.Reader) (result []map[string]interface{}, err error) {
 }
 
 func writeToFile(filename string, val interface{}) error {
-	out, err := yaml.Marshal(val)
-	if err != nil {
-		return err
-	}
+	out, _ := yaml.Marshal(val)
 	return ioutil.WriteFile(filename, out, os.ModePerm)
 }
 
