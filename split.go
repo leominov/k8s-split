@@ -79,7 +79,7 @@ func ByEntries(r io.Reader) (result []map[string]interface{}, err error) {
 
 func writeToFile(filename string, val interface{}) error {
 	out, _ := yaml.Marshal(val)
-	return ioutil.WriteFile(filename, out, os.ModePerm)
+	return ioutil.WriteFile(filename, out, 0644)
 }
 
 // GetNameAndKind get Kubernetes `kind` and `name` from document
