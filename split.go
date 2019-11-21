@@ -82,8 +82,7 @@ func writeToFile(filename string, val interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filename, out, os.ModePerm)
-	return err
+	return ioutil.WriteFile(filename, out, os.ModePerm)
 }
 
 // GetNameAndKind get Kubernetes `kind` and `name` from document
