@@ -121,4 +121,10 @@ func TestProcess(t *testing.T) {
 			t.Error("Must be an error, but got nil")
 		}
 	}
+
+	err = Process("-", "tmp")
+	// Empty is not an error
+	if err != nil {
+		t.Error(err)
+	}
 }
