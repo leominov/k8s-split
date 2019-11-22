@@ -43,6 +43,11 @@ func Process(input, output string) error {
 	if err != nil {
 		return err
 	}
+	return Save(entries, output)
+}
+
+// Save save entries to output directory
+func Save(entries []map[string]interface{}, output string) error {
 	for _, entry := range entries {
 		kind, name, err := GetNameAndKind(entry)
 		if err != nil {
