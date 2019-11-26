@@ -103,6 +103,7 @@ func TestProcess(t *testing.T) {
 			t.Error(err)
 		}
 	}
+	Quiet = true
 	err = os.Chmod("tmp", 0444)
 	if err != nil {
 		t.Error(err)

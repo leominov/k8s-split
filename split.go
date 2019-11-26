@@ -14,6 +14,10 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+var (
+	Quiet bool
+)
+
 // Description Kubernetes specification
 type Description struct {
 	Kind     string
@@ -53,13 +57,17 @@ func Save(entries []map[string]interface{}, output string) error {
 		if err != nil {
 			return err
 		}
-		log.Printf("Found %s.%s", name, kind)
+		if !Quiet {
+			log.Printf("Found %s.%s", name, kind)
+		}
 		filename := path.Join(output, fmt.Sprintf("%s.%s.yaml", name, kind))
 		err = writeToFile(filename, entry)
 		if err != nil {
 			return err
 		}
-		log.Printf("Saved to %s", filename)
+		if !Quiet {
+			log.Printf("Saved to %s", filename)
+		}
 	}
 	return nil
 }
