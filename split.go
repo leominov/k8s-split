@@ -1,7 +1,6 @@
 package split
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -18,6 +17,12 @@ var (
 	Quiet bool
 )
 
+// List of Kubernetes specifications
+type List struct {
+	Kind  string
+	Items []map[string]interface{}
+}
+
 // Description Kubernetes specification
 type Description struct {
 	Kind     string
@@ -26,9 +31,9 @@ type Description struct {
 	}
 }
 
-func readerFromInput(input string) (io.Reader, error) {
+func readerFromInput(input string) (io.ReadSeeker, error) {
 	if input == "-" {
-		return bufio.NewReader(os.Stdin), nil
+		return os.Stdin, nil
 	}
 	r, err := os.Open(input)
 	if err != nil {
@@ -43,11 +48,16 @@ func Process(input, output string) error {
 	if err != nil {
 		return err
 	}
-	entries, err := ByEntries(r)
+	entriesL, _ := ListByEntries(r)
+	if len(entriesL) > 0 {
+		return Save(entriesL, output)
+	}
+	r.Seek(0, 0)
+	entriesM, err := MultiByEntries(r)
 	if err != nil {
 		return err
 	}
-	return Save(entries, output)
+	return Save(entriesM, output)
 }
 
 // Save save entries to output directory
@@ -72,8 +82,19 @@ func Save(entries []map[string]interface{}, output string) error {
 	return nil
 }
 
-// ByEntries split multi-document YAML into separated maps
-func ByEntries(r io.Reader) (result []map[string]interface{}, err error) {
+// ListByEntries split Kubernetes List into separated maps
+func ListByEntries(r io.ReadSeeker) (result []map[string]interface{}, err error) {
+	var l List
+	err = yaml.NewDecoder(r).Decode(&l)
+	if err != nil {
+		return
+	}
+	result = append(result, l.Items...)
+	return
+}
+
+// MultiByEntries split multi-document YAML into separated maps
+func MultiByEntries(r io.ReadSeeker) (result []map[string]interface{}, err error) {
 	dec := yaml.NewDecoder(r)
 	for {
 		var value map[string]interface{}

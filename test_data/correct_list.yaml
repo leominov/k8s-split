@@ -1,0 +1,12 @@
+kind: List
+items:
+- kind: Secret
+  data:
+    key: dmFsdWU=
+  metadata:
+    name: dco-manager-core-credentials
+- kind: Secret
+  data:
+    key: dmFsdWU=
+  metadata:
+    name: default-token-kzrjn

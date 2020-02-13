@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestByEntries(t *testing.T) {
+func TestMultiByEntries(t *testing.T) {
 	tests := []struct {
 		input string
 		count int
@@ -25,7 +25,7 @@ document: 2
 		},
 	}
 	for _, test := range tests {
-		res, err := ByEntries(bytes.NewReader([]byte(test.input)))
+		res, err := MultiByEntries(bytes.NewReader([]byte(test.input)))
 		if err != nil {
 			t.Error(err)
 		}
@@ -33,7 +33,7 @@ document: 2
 			t.Errorf("Must be %d, but got %d", test.count, len(res))
 		}
 	}
-	_, err := ByEntries(bytes.NewReader([]byte(`
+	_, err := MultiByEntries(bytes.NewReader([]byte(`
 	`)))
 	if err == nil {
 		t.Error("Must be an error, but got nil")
@@ -97,6 +97,7 @@ func TestProcess(t *testing.T) {
 	tests := []string{
 		"test_data/correct_single.yaml",
 		"test_data/correct_multi.yaml",
+		"test_data/correct_list.yaml",
 	}
 	for _, test := range tests {
 		if err := Process(test, "tmp"); err != nil {
@@ -113,9 +114,10 @@ func TestProcess(t *testing.T) {
 	}
 	tests = []string{
 		"test_data/incorrect_not_found.yaml",
-		"test_data/incurrect_1.yaml",
-		"test_data/incurrect_2.yaml",
-		"test_data/incurrect_3.yaml",
+		"test_data/incorrect_1.yaml",
+		"test_data/incorrect_2.yaml",
+		"test_data/incorrect_3.yaml",
+		"test_data/incorrect_list.yaml",
 	}
 	for _, test := range tests {
 		if err := Process(test, "tmp"); err == nil {
