@@ -17,6 +17,16 @@ Found single.CronJob
 Saved to single.CronJob.yaml
 ```
 
+or
+
+```
+$ k8s-split -f test_data/correct_list.yaml -o ./
+Found dco-manager-core-credentials.Secret
+Saved to dco-manager-core-credentials.Secret.yaml
+Found default-token-kzrjn.Secret
+Saved to default-token-kzrjn.Secret.yaml
+```
+
 ### Stdin
 
 ```
