@@ -98,6 +98,7 @@ func TestProcess(t *testing.T) {
 		"test_data/correct_single.yaml",
 		"test_data/correct_multi.yaml",
 		"test_data/correct_list.yaml",
+		"test_data/correct_single_with_items.yaml",
 	}
 	for _, test := range tests {
 		if err := Process(test, "tmp"); err != nil {

@@ -1,0 +1,8 @@
+---
+kind: Pod
+metadata:
+  name: single-with-items
+items:
+  - kind: Pod
+    metadata:
+      name: single-with-items

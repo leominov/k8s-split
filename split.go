@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	yaml "gopkg.in/yaml.v2"
@@ -87,6 +88,9 @@ func ListByEntries(r io.ReadSeeker) (result []map[string]interface{}, err error)
 	var l List
 	err = yaml.NewDecoder(r).Decode(&l)
 	if err != nil {
+		return
+	}
+	if strings.ToLower(l.Kind) != "list" {
 		return
 	}
 	result = append(result, l.Items...)
