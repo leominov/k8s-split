@@ -2,6 +2,7 @@ package split
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -86,13 +87,12 @@ func TestGetNameAndKind(t *testing.T) {
 }
 
 func TestProcess(t *testing.T) {
-	err := os.MkdirAll("tmp", os.ModePerm)
+	dir, err := ioutil.TempDir("", "k8s-split")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	defer func() {
-		os.Chmod("tmp", os.ModePerm)
-		os.RemoveAll("tmp")
+		os.RemoveAll(dir)
 	}()
 	tests := []string{
 		"test_data/correct_single.yaml",
@@ -101,16 +101,16 @@ func TestProcess(t *testing.T) {
 		"test_data/correct_single_with_items.yaml",
 	}
 	for _, test := range tests {
-		if err := Process(test, "tmp"); err != nil {
+		if err := Process(test, dir); err != nil {
 			t.Error(err)
 		}
 	}
 	Quiet = true
-	err = os.Chmod("tmp", 0444)
+	err = os.Chmod(dir, 0444)
 	if err != nil {
 		t.Error(err)
 	}
-	if err := Process("test_data/correct_single.yaml", "tmp"); err == nil {
+	if err := Process("test_data/correct_single.yaml", dir); err == nil {
 		t.Error("Must be an error, but got nil")
 	}
 	tests = []string{
@@ -121,12 +121,12 @@ func TestProcess(t *testing.T) {
 		"test_data/incorrect_list.yaml",
 	}
 	for _, test := range tests {
-		if err := Process(test, "tmp"); err == nil {
+		if err := Process(test, dir); err == nil {
 			t.Error("Must be an error, but got nil")
 		}
 	}
 
-	err = Process("-", "tmp")
+	err = Process("-", dir)
 	// Empty is not an error
 	if err != nil {
 		t.Error(err)
