@@ -36,3 +36,13 @@ Saved to single.Pod.yaml
 Found single.CronJob
 Saved to single.CronJob.yaml
 ```
+
+or
+
+```
+$ kubectl get secrets -o yaml | k8s-split -f -
+Found dco-manager-core-credentials.Secret
+Saved to dco-manager-core-credentials.Secret.yaml
+Found default-token-kzrjn.Secret
+Saved to default-token-kzrjn.Secret.yaml
+```
