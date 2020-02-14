@@ -1,5 +1,6 @@
 # k8s-split
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/leominov/k8s-split)](https://github.com/leominov/k8s-split/releases/latest)
 [![Build Status](https://travis-ci.com/leominov/k8s-split.svg?branch=master)](https://travis-ci.com/leominov/k8s-split)
 [![codecov](https://codecov.io/gh/leominov/k8s-split/branch/master/graph/badge.svg)](https://codecov.io/gh/leominov/k8s-split)
 
