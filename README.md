@@ -46,3 +46,7 @@ Saved to dco-manager-core-credentials.Secret.yaml
 Found default-token-kzrjn.Secret
 Saved to default-token-kzrjn.Secret.yaml
 ```
+
+## Download
+
+* https://github.com/leominov/k8s-split/releases/latest
