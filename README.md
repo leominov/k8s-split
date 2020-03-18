@@ -21,6 +21,16 @@ Saved to single.CronJob.yaml
 or
 
 ```
+$ k8s-split -f test_data/correct_multi.yaml -o ./ --prefix
+Found single.Pod
+Saved to single/single.Pod.yaml
+Found single.CronJob
+Saved to single/single.CronJob.yaml
+```
+
+or
+
+```
 $ k8s-split -f test_data/correct_list.yaml -o ./
 Found dco-manager-core-credentials.Secret
 Saved to dco-manager-core-credentials.Secret.yaml
