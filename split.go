@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	Quiet bool
+	Quiet  bool
+	Prefix bool
 )
 
 // List of Kubernetes specifications
@@ -61,8 +62,37 @@ func Process(input, output string) error {
 	return Save(entriesM, output)
 }
 
+func findLongestNamePrefix(entries []map[string]interface{}) string {
+	var names []string
+	for _, entry := range entries {
+		_, name, _ := GetNameAndKind(entry)
+		names = append(names, name)
+	}
+	return LongestCommonPrefix(names)
+}
+
+func preparePrefixedDirectory(entries []map[string]interface{}, output string) (string, error) {
+	pref := findLongestNamePrefix(entries)
+	if len(pref) == 0 {
+		return output, nil
+	}
+	output = path.Join(output, pref)
+	err := os.MkdirAll(output, 0755)
+	if err != nil {
+		return "", err
+	}
+	return output, nil
+}
+
 // Save save entries to output directory
 func Save(entries []map[string]interface{}, output string) error {
+	if Prefix {
+		prefixedDir, err := preparePrefixedDirectory(entries, output)
+		if err != nil {
+			return err
+		}
+		output = prefixedDir
+	}
 	for _, entry := range entries {
 		kind, name, err := GetNameAndKind(entry)
 		if err != nil {
@@ -124,17 +154,17 @@ func writeToFile(filename string, val interface{}) error {
 func GetNameAndKind(val interface{}) (kind, name string, err error) {
 	result := &Description{}
 	if err = mapstructure.Decode(val, &result); err != nil {
-		err = fmt.Errorf("Failed to decode body: %v", err)
-		return
-	}
-	kind = result.Kind
-	if len(kind) == 0 {
-		err = errors.New("Kind not found")
+		err = fmt.Errorf("failed to decode body: %v", err)
 		return
 	}
 	name = result.Metadata.Name
 	if len(name) == 0 {
-		err = errors.New("Name not found")
+		err = errors.New("name not found")
+		return
+	}
+	kind = result.Kind
+	if len(kind) == 0 {
+		err = errors.New("kind not found")
 		return
 	}
 	return

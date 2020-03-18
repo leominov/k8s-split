@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 )
 
@@ -91,9 +92,7 @@ func TestProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
-		os.RemoveAll(dir)
-	}()
+	defer os.RemoveAll(dir)
 	tests := []string{
 		"test_data/correct_single.yaml",
 		"test_data/correct_multi.yaml",
@@ -106,6 +105,9 @@ func TestProcess(t *testing.T) {
 		}
 	}
 	Quiet = true
+	defer func() {
+		Quiet = false
+	}()
 	err = os.Chmod(dir, 0444)
 	if err != nil {
 		t.Error(err)
@@ -130,5 +132,58 @@ func TestProcess(t *testing.T) {
 	// Empty is not an error
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestProcess_Prefix(t *testing.T) {
+	Prefix = true
+	defer func() {
+		Prefix = false
+	}()
+
+	dir1, err := ioutil.TempDir("", "k8s-split-prefix")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir1)
+	err = Process("test_data/correct_multi_prefix.yaml", dir1)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = os.Stat(path.Join(dir1, "application"))
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = os.Stat(path.Join(dir1, "application", "application.Pod.yaml"))
+	if err != nil {
+		t.Error(err)
+	}
+
+	dir2, err := ioutil.TempDir("", "k8s-split-prefix")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir2)
+	err = Process("test_data/correct_multi_prefix_empty.yaml", dir2)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = os.Stat(path.Join(dir2, "application.Pod.yaml"))
+	if err != nil {
+		t.Error(err)
+	}
+
+	dir3, err := ioutil.TempDir("", "k8s-split-prefix")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir3)
+	_, err = os.Create(path.Join(dir3, "application"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Process("test_data/correct_multi_prefix.yaml", dir3)
+	if err == nil {
+		t.Error("Must be an error, but got nil")
 	}
 }

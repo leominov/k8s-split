@@ -1,0 +1,12 @@
+---
+kind: Pod
+metadata:
+  name: application
+---
+kind: Service
+metadata:
+  name: application
+---
+kind: CronJob
+metadata:
+  name: application-backup

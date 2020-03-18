@@ -1,3 +1,7 @@
+# IDE
+.vscode
+.idea
+
 /k8s-split
 /coverage.txt
 /tmp
