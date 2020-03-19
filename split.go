@@ -1,6 +1,7 @@
 package split
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -35,7 +36,8 @@ type Description struct {
 
 func readerFromInput(input string) (io.ReadSeeker, error) {
 	if input == "-" {
-		return os.Stdin, nil
+		b, err := ioutil.ReadAll(os.Stdin)
+		return bytes.NewReader(b), err
 	}
 	r, err := os.Open(input)
 	if err != nil {
@@ -54,7 +56,7 @@ func Process(input, output string) error {
 	if len(entriesL) > 0 {
 		return Save(entriesL, output)
 	}
-	r.Seek(0, 0)
+	r.Seek(0, io.SeekStart)
 	entriesM, err := MultiByEntries(r)
 	if err != nil {
 		return err
