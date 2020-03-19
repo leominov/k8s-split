@@ -58,6 +58,16 @@ Found default-token-kzrjn.Secret
 Saved to default-token-kzrjn.Secret.yaml
 ```
 
+or
+
+```
+$ kustomize build test_data | k8s-split -f - --prefix
+Found single.CronJob
+Saved to single/single.CronJob.yaml
+Found single.Pod
+Saved to single/single.Pod.yaml
+```
+
 ## Download
 
 * https://github.com/leominov/k8s-split/releases/latest
