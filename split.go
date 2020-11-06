@@ -31,6 +31,9 @@ type Description struct {
 	Kind     string
 	Metadata struct {
 		Name string
+		Labels struct {
+			PartOf string `mapstructure:"app.kubernetes.io/part-of"`
+		}
 	}
 }
 
@@ -96,7 +99,7 @@ func Save(entries []map[string]interface{}, output string) error {
 		output = prefixedDir
 	}
 	for _, entry := range entries {
-		kind, name, err := GetNameAndKind(entry)
+		kind, name, _, err := GetNameAndKindAndPartof(entry)
 		if err != nil {
 			return err
 		}
@@ -152,8 +155,8 @@ func writeToFile(filename string, val interface{}) error {
 	return ioutil.WriteFile(filename, out, 0644)
 }
 
-// GetNameAndKind get Kubernetes `kind` and `name` from document
-func GetNameAndKind(val interface{}) (kind, name string, err error) {
+// GetNameAndKindAndPartof get Kubernetes `kind` and `name` from document
+func GetNameAndKindAndPartof(val interface{}) (kind, name, partof string, err error) {
 	result := &Description{}
 	if err = mapstructure.Decode(val, &result); err != nil {
 		err = fmt.Errorf("failed to decode body: %v", err)
@@ -169,5 +172,28 @@ func GetNameAndKind(val interface{}) (kind, name string, err error) {
 		err = errors.New("kind not found")
 		return
 	}
+	partof = result.Metadata.Labels.PartOf
+
 	return
+}
+
+// FindUniqueLabelValues returns list of unique part-of label in document
+func FindUniqueLabelValues(entries []map[string]interface{}) []string {
+	var labels []string
+	for _, entry := range entries {
+		_, _, label, _ := GetNameAndKindAndPartof(entry)
+		labels = append(labels, label)
+	}
+
+	j := 0
+	for i := 1; i < len(labels); i++ {
+		if labels[j] == labels[i] {
+			continue
+		}
+		j++
+		labels[j] = labels[i]
+	}
+	result := labels[:j+1]
+
+	return result
 }
