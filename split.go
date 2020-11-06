@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	Quiet  bool
-	Prefix bool
+	Quiet   bool
+	Prefix  bool
+	SplitBy string
 )
 
 // List of Kubernetes specifications
@@ -30,7 +31,7 @@ type List struct {
 type Description struct {
 	Kind     string
 	Metadata struct {
-		Name string
+		Name   string
 		Labels struct {
 			PartOf string `mapstructure:"app.kubernetes.io/part-of"`
 		}

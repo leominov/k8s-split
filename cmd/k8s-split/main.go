@@ -8,16 +8,18 @@ import (
 )
 
 var (
-	input  = flag.String("f", "", "Path to file with Kubernetes specification")
-	output = flag.String("o", "", "Path to output directory")
-	quiet  = flag.Bool("q", false, "Turn off k8s-split's output")
-	prefix = flag.Bool("prefix", false, "Use longest name prefix as directory's name")
+	input   = flag.String("f", "", "Path to file with Kubernetes specification")
+	output  = flag.String("o", "", "Path to output directory")
+	quiet   = flag.Bool("q", false, "Turn off k8s-split's output")
+	prefix  = flag.Bool("prefix", false, "Use longest name prefix as directory's name")
+	splitby = flag.String("split", "prefix", "Method to choose a dicrectory's name")
 )
 
 func main() {
 	flag.Parse()
 	split.Quiet = *quiet
 	split.Prefix = *prefix
+	split.SplitBy = *splitby
 	err := split.Process(*input, *output)
 	if err != nil {
 		log.Fatal(err)
