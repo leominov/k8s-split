@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"reflect"
 )
 
 func TestMultiByEntries(t *testing.T) {
@@ -186,4 +187,68 @@ func TestProcess_Prefix(t *testing.T) {
 	if err == nil {
 		t.Error("Must be an error, but got nil")
 	}
+}
+
+func TestFindUniqueLabelValues(t *testing.T) {
+	t.Run("Object with app.kubernetes.io/part-of label", func(t *testing.T) {
+		testObj := []map[string]interface{}{
+			{
+				"kind": "kind",
+				"metadata": map[string]interface{}{
+					"name": "name",
+					"labels": map[string]interface{}{
+						"app.kubernetes.io/part-of": "foo",
+					},
+				},
+			},
+			{
+				"kind": "kind",
+				"metadata": map[string]interface{}{
+					"name": "name",
+					"labels": map[string]interface{}{
+						"app.kubernetes.io/part-of": "bar",
+					},
+				},
+			},
+		}
+
+		want := []string{"foo", "bar"}
+		got := FindUniqueLabelValues(testObj)
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %v want %v", got, want)
+		}
+	},
+	)
+
+	t.Run("Object with duplicate app.kubernetes.io/part-of label", func(t *testing.T) {
+		testObj := []map[string]interface{}{
+			{
+				"kind": "kind",
+				"metadata": map[string]interface{}{
+					"name": "name",
+					"labels": map[string]interface{}{
+						"app.kubernetes.io/part-of": "foo",
+					},
+				},
+			},
+			{
+				"kind": "kind",
+				"metadata": map[string]interface{}{
+					"name": "name2",
+					"labels": map[string]interface{}{
+						"app.kubernetes.io/part-of": "foo",
+					},
+				},
+			},
+		}
+
+		want := []string{"foo"}
+		got := FindUniqueLabelValues(testObj)
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %v want %v", got, want)
+		}
+	},
+	)
 }
