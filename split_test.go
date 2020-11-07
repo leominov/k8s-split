@@ -43,7 +43,7 @@ document: 2
 	}
 }
 
-func TestGetNameAndKind(t *testing.T) {
+func TestGetNameAndKindAndPartof(t *testing.T) {
 	tests := []struct {
 		val        interface{}
 		name, kind string
@@ -65,7 +65,7 @@ func TestGetNameAndKind(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		_, _, err := GetNameAndKind(test.val)
+		_, _, _, err := GetNameAndKindAndPartof(test.val)
 		if err == nil {
 			t.Error("Must be an error, but got nil")
 		}
@@ -74,9 +74,12 @@ func TestGetNameAndKind(t *testing.T) {
 		"kind": "kind",
 		"metadata": map[string]interface{}{
 			"name": "name",
+			"labels": map[string]interface{}{
+				"app.kubernetes.io/part-of": "bar",
+			},
 		},
 	}
-	kind, name, err := GetNameAndKind(successTest)
+	kind, name, partof, err := GetNameAndKindAndPartof(successTest)
 	if err != nil {
 		t.Error(err)
 	}
@@ -85,6 +88,9 @@ func TestGetNameAndKind(t *testing.T) {
 	}
 	if name != "name" {
 		t.Errorf("Must be name, but got %s", name)
+	}
+	if partof != "bar" {
+		t.Errorf("Must be bar, but got %s", partof)
 	}
 }
 
@@ -213,7 +219,7 @@ func TestFindUniqueLabelValues(t *testing.T) {
 		}
 
 		want := []string{"foo", "bar"}
-		got := FindUniqueLabelValues(testObj)
+		got, _ := FindUniqueLabelValues(testObj)
 
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("got %v want %v", got, want)
@@ -244,7 +250,7 @@ func TestFindUniqueLabelValues(t *testing.T) {
 		}
 
 		want := []string{"foo"}
-		got := FindUniqueLabelValues(testObj)
+		got, _ := FindUniqueLabelValues(testObj)
 
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("got %v want %v", got, want)
@@ -252,3 +258,57 @@ func TestFindUniqueLabelValues(t *testing.T) {
 	},
 	)
 }
+
+// func TestPreparePrefixedDirectory(t *testing.T) {
+
+// 	testObj := []map[string]interface{}{
+// 		{
+// 			"kind": "kind",
+// 			"metadata": map[string]interface{}{
+// 				"name": "name",
+// 				"labels": map[string]interface{}{
+// 					"app.kubernetes.io/part-of": "foo",
+// 				},
+// 			},
+// 		},
+// 		{
+// 			"kind": "kind",
+// 			"metadata": map[string]interface{}{
+// 				"name": "name2",
+// 				"labels": map[string]interface{}{
+// 					"app.kubernetes.io/part-of": "bar",
+// 				},
+// 			},
+// 		},
+// 		{
+// 			"kind": "kind",
+// 			"metadata": map[string]interface{}{
+// 				"name": "name3",
+// 				"labels": map[string]interface{}{
+// 					"foo": "bar",
+// 				},
+// 			},
+// 		},
+// 	}
+
+// 	dir, err := ioutil.TempDir("", "output")
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	defer os.RemoveAll(dir) 
+
+// 	subdir := []string{"foo", "bar"}
+
+// 	_, err = preparePrefixedDirectory(subdir, dir)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+
+// 	for _, label := range subdir {
+// 		_, err = os.Stat(path.Join(dir, label))
+// 		if err != nil {
+// 			t.Error(err)
+// 		}
+// 	}
+// }
