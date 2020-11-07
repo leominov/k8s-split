@@ -71,41 +71,60 @@ func Process(input, output string) error {
 func findLongestNamePrefix(entries []map[string]interface{}) string {
 	var names []string
 	for _, entry := range entries {
-		_, name, _ := GetNameAndKind(entry)
+		_, name, _, _ := GetNameAndKindAndPartof(entry)
 		names = append(names, name)
 	}
 	return LongestCommonPrefix(names)
 }
 
 func preparePrefixedDirectory(entries []map[string]interface{}, output string) (string, error) {
-	pref := findLongestNamePrefix(entries)
-	if len(pref) == 0 {
-		return output, nil
-	}
-	output = path.Join(output, pref)
-	err := os.MkdirAll(output, 0755)
-	if err != nil {
-		return "", err
+	if SplitBy == "prefix" {
+		pref := findLongestNamePrefix(entries)
+		if len(pref) == 0 {
+			return output, nil
+		}
+		output = path.Join(output, pref)
+		err := os.MkdirAll(output, 0755)
+		if err != nil {
+			return "", err
+		}
+		if SplitBy == "tag" {
+			labels, err := FindUniqueLabelValues(entries)
+			if err != nil {
+				return "", err
+			}
+			for _, label := range labels {
+				err := os.MkdirAll(path.Join(output, label), 0755)
+				if err != nil {
+					return "", err
+				}
+			}
+		}
 	}
 	return output, nil
+
 }
 
 // Save save entries to output directory
 func Save(entries []map[string]interface{}, output string) error {
-	if Prefix {
-		prefixedDir, err := preparePrefixedDirectory(entries, output)
-		if err != nil {
-			return err
-		}
-		output = prefixedDir
+	prefixedDir, err := preparePrefixedDirectory(entries, output)
+	if err != nil {
+		return err
 	}
+
 	for _, entry := range entries {
-		kind, name, _, err := GetNameAndKindAndPartof(entry)
+		kind, name, partof, err := GetNameAndKindAndPartof(entry)
 		if err != nil {
 			return err
 		}
 		if !Quiet {
 			log.Printf("Found %s.%s", name, kind)
+		}
+		if SplitBy == "tag" {
+			output = path.Join(prefixedDir, partof)
+		}
+		if SplitBy == "prefix" {
+			output = prefixedDir
 		}
 		filename := path.Join(output, fmt.Sprintf("%s.%s.yaml", name, kind))
 		err = writeToFile(filename, entry)
@@ -179,7 +198,7 @@ func GetNameAndKindAndPartof(val interface{}) (kind, name, partof string, err er
 }
 
 // FindUniqueLabelValues returns list of unique part-of label in document
-func FindUniqueLabelValues(entries []map[string]interface{}) []string {
+func FindUniqueLabelValues(entries []map[string]interface{}) ([]string, error) {
 	var labels []string
 	for _, entry := range entries {
 		_, _, label, _ := GetNameAndKindAndPartof(entry)
@@ -196,5 +215,5 @@ func FindUniqueLabelValues(entries []map[string]interface{}) []string {
 	}
 	result := labels[:j+1]
 
-	return result
+	return result, nil
 }
