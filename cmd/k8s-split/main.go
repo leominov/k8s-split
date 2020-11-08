@@ -18,7 +18,6 @@ var (
 func main() {
 	flag.Parse()
 	split.Quiet = *quiet
-	split.Prefix = *prefix
 	split.SplitBy = *splitby
 	err := split.Process(*input, *output)
 	if err != nil {
