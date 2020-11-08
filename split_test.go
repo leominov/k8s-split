@@ -259,56 +259,56 @@ func TestFindUniqueLabelValues(t *testing.T) {
 	)
 }
 
-// func TestPreparePrefixedDirectory(t *testing.T) {
+func TestPreparePrefixedDirectory(t *testing.T) {
 
-// 	testObj := []map[string]interface{}{
-// 		{
-// 			"kind": "kind",
-// 			"metadata": map[string]interface{}{
-// 				"name": "name",
-// 				"labels": map[string]interface{}{
-// 					"app.kubernetes.io/part-of": "foo",
-// 				},
-// 			},
-// 		},
-// 		{
-// 			"kind": "kind",
-// 			"metadata": map[string]interface{}{
-// 				"name": "name2",
-// 				"labels": map[string]interface{}{
-// 					"app.kubernetes.io/part-of": "bar",
-// 				},
-// 			},
-// 		},
-// 		{
-// 			"kind": "kind",
-// 			"metadata": map[string]interface{}{
-// 				"name": "name3",
-// 				"labels": map[string]interface{}{
-// 					"foo": "bar",
-// 				},
-// 			},
-// 		},
-// 	}
+	testObj := []map[string]interface{}{
+		{
+			"kind": "kind",
+			"metadata": map[string]interface{}{
+				"name": "name",
+				"labels": map[string]interface{}{
+					"app.kubernetes.io/part-of": "foo",
+				},
+			},
+		},
+		{
+			"kind": "kind",
+			"metadata": map[string]interface{}{
+				"name": "name2",
+				"labels": map[string]interface{}{
+					"app.kubernetes.io/part-of": "bar",
+				},
+			},
+		},
+		{
+			"kind": "kind",
+			"metadata": map[string]interface{}{
+				"name": "name3",
+				"labels": map[string]interface{}{
+					"foo": "bar",
+				},
+			},
+		},
+	}
 
-// 	dir, err := ioutil.TempDir("", "output")
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	dir, err := ioutil.TempDir("", "output")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	defer os.RemoveAll(dir) 
+	defer os.RemoveAll(dir) 
 
-// 	subdir := []string{"foo", "bar"}
+	subdir := []string{"foo", "bar"}
 
-// 	_, err = preparePrefixedDirectory(subdir, dir)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	_, err = preparePrefixedDirectory(testObj, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-// 	for _, label := range subdir {
-// 		_, err = os.Stat(path.Join(dir, label))
-// 		if err != nil {
-// 			t.Error(err)
-// 		}
-// 	}
-// }
+	for _, label := range subdir {
+		_, err = os.Stat(path.Join(dir, label))
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
