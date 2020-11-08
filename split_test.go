@@ -142,7 +142,7 @@ func TestProcess(t *testing.T) {
 	}
 }
 
-func TestProcess_Prefix(t *testing.T) {
+func TestProcess_Split(t *testing.T) {
 	SplitBy = "prefix"
 	defer func() {
 		SplitBy = ""
@@ -193,19 +193,17 @@ func TestProcess_Prefix(t *testing.T) {
 	if err == nil {
 		t.Error("Must be an error, but got nil")
 	}
-}
 
-func TestProcess_Tag(t *testing.T) {
 	SplitBy = "tag"
 	defer func() {
 		SplitBy = ""
 	}()
 
-	dir1, err := ioutil.TempDir("", "k8s-split-prefix")
+	dir4, err := ioutil.TempDir("", "k8s-split-prefix")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(dir1)
+	defer os.RemoveAll(dir4)
 	err = Process("test_data/correct_multi_prefix.yaml", dir1)
 	if err != nil {
 		t.Error(err)
@@ -218,34 +216,6 @@ func TestProcess_Tag(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	// dir2, err := ioutil.TempDir("", "k8s-split-prefix")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// defer os.RemoveAll(dir2)
-	// err = Process("test_data/correct_multi_prefix_empty.yaml", dir2)
-	// if err != nil {
-	// 	t.Error(err)
-	// }
-	// _, err = os.Stat(path.Join(dir2, "application.Pod.yaml"))
-	// if err != nil {
-	// 	t.Error(err)
-	// }
-
-	// dir3, err := ioutil.TempDir("", "k8s-split-prefix")
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// defer os.RemoveAll(dir3)
-	// _, err = os.Create(path.Join(dir3, "application"))
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// err = Process("test_data/correct_multi_prefix.yaml", dir3)
-	// if err == nil {
-	// 	t.Error("Must be an error, but got nil")
-	// }
 }
 
 func TestFindUniqueLabelValues(t *testing.T) {
@@ -316,27 +286,27 @@ func TestPreparePrefixedDirectory(t *testing.T) {
 
 	testObj := []map[string]interface{}{
 		{
-			"kind": "kind",
+			"kind": "Pod",
 			"metadata": map[string]interface{}{
-				"name": "name",
+				"name": "application",
 				"labels": map[string]interface{}{
 					"app.kubernetes.io/part-of": "foo",
 				},
 			},
 		},
 		{
-			"kind": "kind",
+			"kind": "Service",
 			"metadata": map[string]interface{}{
-				"name": "name2",
+				"name": "application",
 				"labels": map[string]interface{}{
 					"app.kubernetes.io/part-of": "bar",
 				},
 			},
 		},
 		{
-			"kind": "kind",
+			"kind": "Job",
 			"metadata": map[string]interface{}{
-				"name": "name3",
+				"name": "application",
 				"labels": map[string]interface{}{
 					"foo": "bar",
 				},
@@ -344,29 +314,52 @@ func TestPreparePrefixedDirectory(t *testing.T) {
 		},
 	}
 
-	SplitBy = "tag"
-	defer func() {
-		SplitBy = ""
-	}()
-
-	dir, err := ioutil.TempDir("", "output")
-	if err != nil {
-		t.Fatal(err)
+	TestCases := []struct {
+		Description string
+		SplitAction string
+		val         []map[string]interface{}
+		ExpectedDirs []string
+	}{
+		{
+			"Split by prefix",
+			"prefix",
+			testObj,
+			[]string{"application"},
+		},
+		{
+			"Split by tag",
+			"tag",
+			testObj,
+			[]string{"foo", "bar"},
+		},
 	}
+	
+	for _, tc := range TestCases {
+		t.Run(tc.Description, func(t *testing.T) {
+			SplitBy = tc.SplitAction
+			defer func() {
+				SplitBy = ""
+			}()
 
-	defer os.RemoveAll(dir) 
+			maindir, err := ioutil.TempDir("", "output")
+			if err != nil {
+				t.Fatal(err)
+			}
+		
+			defer os.RemoveAll(maindir) 
+		
+			_, err = preparePrefixedDirectory(tc.val, maindir)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	subdir := []string{"foo", "bar"}
+			for _, dir := range tc.ExpectedDirs {
+				_, err = os.Stat(path.Join(maindir, dir))
+				if err != nil {
+					t.Error(err)
+				}
+			}
+		})
 
-	_, err = preparePrefixedDirectory(testObj, dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, label := range subdir {
-		_, err = os.Stat(path.Join(dir, label))
-		if err != nil {
-			t.Error(err)
-		}
 	}
 }
