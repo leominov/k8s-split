@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.com/leominov/k8s-split.svg?branch=master)](https://travis-ci.com/leominov/k8s-split)
 [![codecov](https://codecov.io/gh/leominov/k8s-split/branch/master/graph/badge.svg)](https://codecov.io/gh/leominov/k8s-split)
 
-Split multi-document or `kind: List` Kubernetes specification file into separate files by `name` and `kind`.
+Split multi-document or `kind: List` Kubernetes specification file into separate files by `name` and `kind`. It is possible to save splitted files in directories based on longest name prefix or on the value of `app.kubernetes.io/part-of` tag.
 
 ## Usage
 
@@ -21,11 +21,23 @@ Saved to single.CronJob.yaml
 or
 
 ```
-$ k8s-split -f test_data/correct_multi.yaml -o ./ --prefix
+$ k8s-split -f test_data/correct_multi.yaml -o ./ -s prefix
 Found single.Pod
 Saved to single/single.Pod.yaml
 Found single.CronJob
 Saved to single/single.CronJob.yaml
+```
+
+or
+
+```
+$ k8s-split -f test_data/correct_multi_prefix.yaml -o ./ -s tag
+Found application.Pod
+Saved to bar/application.Pod.yaml
+Found application.Service
+Saved to bar/application.Service.yaml
+Found application-backup.CronJob
+Saved to foo/application-backup.CronJob.yaml
 ```
 
 or
@@ -61,7 +73,7 @@ Saved to default-token-kzrjn.Secret.yaml
 or
 
 ```
-$ kustomize build test_data | k8s-split -f - --prefix
+$ kustomize build test_data | k8s-split -f - -s prefix
 Found single.CronJob
 Saved to single/single.CronJob.yaml
 Found single.Pod
