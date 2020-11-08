@@ -17,7 +17,6 @@ import (
 
 var (
 	Quiet   bool
-	Prefix  bool
 	SplitBy string
 )
 
