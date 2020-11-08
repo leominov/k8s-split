@@ -143,9 +143,9 @@ func TestProcess(t *testing.T) {
 }
 
 func TestProcess_Prefix(t *testing.T) {
-	Prefix = true
+	SplitBy = "prefix"
 	defer func() {
-		Prefix = false
+		SplitBy = ""
 	}()
 
 	dir1, err := ioutil.TempDir("", "k8s-split-prefix")
@@ -290,6 +290,11 @@ func TestPreparePrefixedDirectory(t *testing.T) {
 			},
 		},
 	}
+
+	SplitBy = "tag"
+	defer func() {
+		SplitBy = ""
+	}()
 
 	dir, err := ioutil.TempDir("", "output")
 	if err != nil {
