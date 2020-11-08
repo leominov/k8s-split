@@ -11,8 +11,7 @@ var (
 	input   = flag.String("f", "", "Path to file with Kubernetes specification")
 	output  = flag.String("o", "", "Path to output directory")
 	quiet   = flag.Bool("q", false, "Turn off k8s-split's output")
-	prefix  = flag.Bool("prefix", false, "Use longest name prefix as directory's name")
-	splitby = flag.String("split", "", "Method to choose a dicrectory's name")
+	splitby = flag.String("s", "", "Method to choose a directory's name: {prefix | tag}")
 )
 
 func main() {
