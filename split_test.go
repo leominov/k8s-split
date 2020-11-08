@@ -195,6 +195,59 @@ func TestProcess_Prefix(t *testing.T) {
 	}
 }
 
+func TestProcess_Tag(t *testing.T) {
+	SplitBy = "tag"
+	defer func() {
+		SplitBy = ""
+	}()
+
+	dir1, err := ioutil.TempDir("", "k8s-split-prefix")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir1)
+	err = Process("test_data/correct_multi_prefix.yaml", dir1)
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = os.Stat(path.Join(dir1, "bar"))
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = os.Stat(path.Join(dir1, "bar", "application.Pod.yaml"))
+	if err != nil {
+		t.Error(err)
+	}
+
+	// dir2, err := ioutil.TempDir("", "k8s-split-prefix")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// defer os.RemoveAll(dir2)
+	// err = Process("test_data/correct_multi_prefix_empty.yaml", dir2)
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+	// _, err = os.Stat(path.Join(dir2, "application.Pod.yaml"))
+	// if err != nil {
+	// 	t.Error(err)
+	// }
+
+	// dir3, err := ioutil.TempDir("", "k8s-split-prefix")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// defer os.RemoveAll(dir3)
+	// _, err = os.Create(path.Join(dir3, "application"))
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// err = Process("test_data/correct_multi_prefix.yaml", dir3)
+	// if err == nil {
+	// 	t.Error("Must be an error, but got nil")
+	// }
+}
+
 func TestFindUniqueLabelValues(t *testing.T) {
 	t.Run("Object with app.kubernetes.io/part-of label", func(t *testing.T) {
 		testObj := []map[string]interface{}{
