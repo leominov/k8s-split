@@ -88,19 +88,20 @@ func preparePrefixedDirectory(entries []map[string]interface{}, output string) (
 		if err != nil {
 			return "", err
 		}
-		if SplitBy == "tag" {
-			labels, err := FindUniqueLabelValues(entries)
+	}
+	if SplitBy == "tag" {
+		labels, err := FindUniqueLabelValues(entries)
+		if err != nil {
+			return "", err
+		}
+		for _, label := range labels {
+			err := os.MkdirAll(path.Join(output, label), 0755)
 			if err != nil {
 				return "", err
 			}
-			for _, label := range labels {
-				err := os.MkdirAll(path.Join(output, label), 0755)
-				if err != nil {
-					return "", err
-				}
-			}
 		}
 	}
+
 	return output, nil
 
 }
