@@ -2,11 +2,17 @@
 kind: Pod
 metadata:
   name: application
+  labels:
+    app.kubernetes.io/part-of: "bar"
 ---
 kind: Service
 metadata:
   name: application
+  labels:
+    app.kubernetes.io/part-of: "bar"
 ---
 kind: CronJob
 metadata:
+  labels:
+    app.kubernetes.io/part-of: "bar"
   name: application-backup
