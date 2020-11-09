@@ -204,15 +204,15 @@ func TestProcess_Split(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir4)
-	err = Process("test_data/correct_multi_prefix.yaml", dir1)
+	err = Process("test_data/correct_multi_prefix.yaml", dir4)
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = os.Stat(path.Join(dir1, "bar"))
+	_, err = os.Stat(path.Join(dir4, "bar"))
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = os.Stat(path.Join(dir1, "bar", "application.Pod.yaml"))
+	_, err = os.Stat(path.Join(dir4, "bar", "application.Pod.yaml"))
 	if err != nil {
 		t.Error(err)
 	}
