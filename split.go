@@ -201,8 +201,9 @@ func GetNameAndKindAndPartof(val interface{}) (kind, name, partof string, err er
 func FindUniqueLabelValues(entries []map[string]interface{}) ([]string, error) {
 	var labels []string
 	for _, entry := range entries {
-		_, _, label, _ := GetNameAndKindAndPartof(entry)
-		labels = append(labels, label)
+		if _, _, label, err := GetNameAndKindAndPartof(entry); err == nil {
+			labels = append(labels, label)
+		}
 	}
 
 	j := 0
