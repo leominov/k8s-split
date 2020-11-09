@@ -197,7 +197,7 @@ func GetNameAndKindAndPartof(val interface{}) (kind, name, partof string, err er
 	return
 }
 
-// FindUniqueLabelValues returns list of unique part-of label in document
+// FindUniqueLabelValues returns list of unique app.kubernetes.io/part-of label in document
 func FindUniqueLabelValues(entries []map[string]interface{}) ([]string, error) {
 	var labels []string
 	for _, entry := range entries {
