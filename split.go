@@ -17,7 +17,8 @@ import (
 
 var (
 	Quiet   bool
-	SplitBy string
+	Prefix bool
+	Tag bool
 )
 
 // List of Kubernetes specifications
@@ -77,7 +78,7 @@ func findLongestNamePrefix(entries []map[string]interface{}) string {
 }
 
 func preparePrefixedDirectory(entries []map[string]interface{}, output string) (string, error) {
-	if SplitBy == "prefix" {
+	if Prefix {
 		pref := findLongestNamePrefix(entries)
 		if len(pref) == 0 {
 			return output, nil
@@ -88,7 +89,7 @@ func preparePrefixedDirectory(entries []map[string]interface{}, output string) (
 			return "", err
 		}
 	}
-	if SplitBy == "tag" {
+	if Tag {
 		labels, err := FindUniqueLabelValues(entries)
 		if err != nil {
 			return "", err
@@ -120,10 +121,10 @@ func Save(entries []map[string]interface{}, output string) error {
 		if !Quiet {
 			log.Printf("Found %s.%s", name, kind)
 		}
-		if SplitBy == "tag" {
+		if Tag {
 			output = path.Join(prefixedDir, partof)
 		}
-		if SplitBy == "prefix" {
+		if Prefix {
 			output = prefixedDir
 		}
 		filename := path.Join(output, fmt.Sprintf("%s.%s.yaml", name, kind))

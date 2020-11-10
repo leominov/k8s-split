@@ -14,5 +14,5 @@ metadata:
 kind: CronJob
 metadata:
   labels:
-    app.kubernetes.io/part-of: "foo"
+    app.kubernetes.io/part-of: "bar"
   name: application-backup

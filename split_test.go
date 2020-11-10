@@ -142,10 +142,10 @@ func TestProcess(t *testing.T) {
 	}
 }
 
-func TestProcess_Split(t *testing.T) {
-	SplitBy = "prefix"
+func TestProcess_Prefix(t *testing.T) {
+	Prefix = true
 	defer func() {
-		SplitBy = ""
+		Prefix = false
 	}()
 
 	dir1, err := ioutil.TempDir("", "k8s-split-prefix")
@@ -193,10 +193,12 @@ func TestProcess_Split(t *testing.T) {
 	if err == nil {
 		t.Error("Must be an error, but got nil")
 	}
+}
 
-	SplitBy = "tag"
+func TestProcess_Tag(t *testing.T) {
+	Tag = true
 	defer func() {
-		SplitBy = ""
+		Tag = false
 	}()
 
 	dir4, err := ioutil.TempDir("", "k8s-split-prefix")
@@ -315,39 +317,44 @@ func TestPreparePrefixedDirectory(t *testing.T) {
 	}
 
 	TestCases := []struct {
-		Description string
-		SplitAction string
-		val         []map[string]interface{}
+		Description  string
+		Prefix       bool
+		Tag          bool
+		val          []map[string]interface{}
 		ExpectedDirs []string
 	}{
 		{
 			"Split by prefix",
-			"prefix",
+			true,
+			false,
 			testObj,
 			[]string{"application"},
 		},
 		{
 			"Split by tag",
-			"tag",
+			false,
+			true,
 			testObj,
 			[]string{"foo", "bar"},
 		},
 	}
-	
+
 	for _, tc := range TestCases {
 		t.Run(tc.Description, func(t *testing.T) {
-			SplitBy = tc.SplitAction
+			Prefix = tc.Prefix
+			Tag = tc.Tag
 			defer func() {
-				SplitBy = ""
+				Prefix = false
+				Tag = false
 			}()
 
 			maindir, err := ioutil.TempDir("", "output")
 			if err != nil {
 				t.Fatal(err)
 			}
-		
-			defer os.RemoveAll(maindir) 
-		
+
+			defer os.RemoveAll(maindir)
+
 			_, err = preparePrefixedDirectory(tc.val, maindir)
 			if err != nil {
 				t.Fatal(err)

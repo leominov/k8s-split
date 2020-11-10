@@ -21,7 +21,7 @@ Saved to single.CronJob.yaml
 or
 
 ```
-$ k8s-split -f test_data/correct_multi.yaml -o ./ -s prefix
+$ k8s-split -f test_data/correct_multi.yaml -o ./ --prefix
 Found single.Pod
 Saved to single/single.Pod.yaml
 Found single.CronJob
@@ -31,7 +31,7 @@ Saved to single/single.CronJob.yaml
 or
 
 ```
-$ k8s-split -f test_data/correct_multi_prefix.yaml -o ./ -s tag
+$ k8s-split -f test_data/correct_multi_prefix.yaml -o ./ --tag
 Found application.Pod
 Saved to bar/application.Pod.yaml
 Found application.Service
@@ -73,7 +73,7 @@ Saved to default-token-kzrjn.Secret.yaml
 or
 
 ```
-$ kustomize build test_data | k8s-split -f - -s prefix
+$ kustomize build test_data | k8s-split -f - --prefix
 Found single.CronJob
 Saved to single/single.CronJob.yaml
 Found single.Pod
