@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	Quiet  bool
+	Quiet   bool
 	Prefix bool
+	Tag bool
 )
 
 // List of Kubernetes specifications
@@ -30,7 +31,10 @@ type List struct {
 type Description struct {
 	Kind     string
 	Metadata struct {
-		Name string
+		Name   string
+		Labels struct {
+			PartOf string `mapstructure:"app.kubernetes.io/part-of"`
+		}
 	}
 }
 
@@ -67,41 +71,61 @@ func Process(input, output string) error {
 func findLongestNamePrefix(entries []map[string]interface{}) string {
 	var names []string
 	for _, entry := range entries {
-		_, name, _ := GetNameAndKind(entry)
+		_, name, _, _ := GetNameAndKindAndPartof(entry)
 		names = append(names, name)
 	}
 	return LongestCommonPrefix(names)
 }
 
 func preparePrefixedDirectory(entries []map[string]interface{}, output string) (string, error) {
-	pref := findLongestNamePrefix(entries)
-	if len(pref) == 0 {
-		return output, nil
+	if Prefix {
+		pref := findLongestNamePrefix(entries)
+		if len(pref) == 0 {
+			return output, nil
+		}
+		output = path.Join(output, pref)
+		err := os.MkdirAll(output, 0755)
+		if err != nil {
+			return "", err
+		}
 	}
-	output = path.Join(output, pref)
-	err := os.MkdirAll(output, 0755)
-	if err != nil {
-		return "", err
+	if Tag {
+		labels, err := FindUniqueLabelValues(entries)
+		if err != nil {
+			return "", err
+		}
+		for _, label := range labels {
+			err := os.MkdirAll(path.Join(output, label), 0755)
+			if err != nil {
+				return "", err
+			}
+		}
 	}
+
 	return output, nil
+
 }
 
 // Save save entries to output directory
 func Save(entries []map[string]interface{}, output string) error {
-	if Prefix {
-		prefixedDir, err := preparePrefixedDirectory(entries, output)
-		if err != nil {
-			return err
-		}
-		output = prefixedDir
+	prefixedDir, err := preparePrefixedDirectory(entries, output)
+	if err != nil {
+		return err
 	}
+
 	for _, entry := range entries {
-		kind, name, err := GetNameAndKind(entry)
+		kind, name, partof, err := GetNameAndKindAndPartof(entry)
 		if err != nil {
 			return err
 		}
 		if !Quiet {
 			log.Printf("Found %s.%s", name, kind)
+		}
+		if Tag {
+			output = path.Join(prefixedDir, partof)
+		}
+		if Prefix {
+			output = prefixedDir
 		}
 		filename := path.Join(output, fmt.Sprintf("%s.%s.yaml", name, kind))
 		err = writeToFile(filename, entry)
@@ -152,8 +176,8 @@ func writeToFile(filename string, val interface{}) error {
 	return ioutil.WriteFile(filename, out, 0644)
 }
 
-// GetNameAndKind get Kubernetes `kind` and `name` from document
-func GetNameAndKind(val interface{}) (kind, name string, err error) {
+// GetNameAndKindAndPartof get Kubernetes `kind` and `name` from document
+func GetNameAndKindAndPartof(val interface{}) (kind, name, partof string, err error) {
 	result := &Description{}
 	if err = mapstructure.Decode(val, &result); err != nil {
 		err = fmt.Errorf("failed to decode body: %v", err)
@@ -169,5 +193,29 @@ func GetNameAndKind(val interface{}) (kind, name string, err error) {
 		err = errors.New("kind not found")
 		return
 	}
+	partof = result.Metadata.Labels.PartOf
+
 	return
+}
+
+// FindUniqueLabelValues returns list of unique app.kubernetes.io/part-of label in document
+func FindUniqueLabelValues(entries []map[string]interface{}) ([]string, error) {
+	var labels []string
+	for _, entry := range entries {
+		if _, _, label, err := GetNameAndKindAndPartof(entry); err == nil {
+			labels = append(labels, label)
+		}
+	}
+
+	j := 0
+	for i := 1; i < len(labels); i++ {
+		if labels[j] == labels[i] {
+			continue
+		}
+		j++
+		labels[j] = labels[i]
+	}
+	result := labels[:j+1]
+
+	return result, nil
 }
